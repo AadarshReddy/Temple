@@ -1,17 +1,73 @@
 {% extends 'base.html' %}
-<link rel="manifest" href="/static/manifest.json">
-<meta name="theme-color" content="#800080">
 
 {% block content %}
-  <div class="hero">
-    <div>
-      <h1 class="text-center">Welcome to Lord Venkateswara Temple</h1>
-      <p class="text-center">A Divine Experience Awaits You</p>
+<!-- Hero Banner Section -->
+<div class="hero">
+  <div class="container text-center">
+    <h1>Welcome to Lord Venkateswara Temple</h1>
+    <p>A Divine Experience Awaits You</p>
+  </div>
+</div>
+
+<!-- Devotee Services Section -->
+<div class="container my-5">
+  <h2 class="text-center mb-4 section-heading">Devotee Services</h2>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    <!-- Card 1: Seva & Darshanam -->
+    <div class="col">
+      <div class="card h-100 shadow-sm service-card">
+        <img src="/static/images/seva-icon.png" class="card-img-top p-4" alt="Seva Icon">
+        <div class="card-body text-center">
+          <h5 class="card-title fw-bold">Seva & Darshanam</h5>
+          <p class="card-text">
+            Experience divine blessings through Seva & Darshanam. Book your visit for an auspicious encounter.
+          </p>
+          <a href="/seva" class="btn btn-primary">Book Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Annadanam -->
+    <div class="col">
+      <div class="card h-100 shadow-sm service-card">
+        <img src="/static/images/annadanam.png" class="card-img-top p-4" alt="Annadanam Icon">
+        <div class="card-body text-center">
+          <h5 class="card-title fw-bold">Annadanam</h5>
+          <p class="card-text">
+            Help feed the needy by contributing to daily Annadanam. Your donation can make a significant impact.
+          </p>
+          <a href="/donation" class="btn btn-success">Donate Now</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Accommodation -->
+    <div class="col">
+      <div class="card h-100 shadow-sm service-card">
+        <img src="/static/images/accommodation.png" class="card-img-top p-4" alt="Accommodation Icon">
+        <div class="card-body text-center">
+          <h5 class="card-title fw-bold">Accommodation</h5>
+          <p class="card-text">
+            Comfortable rooms available near the temple for visiting devotees. Contact us for details.
+          </p>
+          <a href="/contact" class="btn btn-warning">Contact</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Donation -->
+    <div class="col">
+      <div class="card h-100 shadow-sm service-card">
+        <img src="/static/images/donation.png" class="card-img-top p-4" alt="Donation Icon">
+        <div class="card-body text-center">
+          <h5 class="card-title fw-bold">Donation</h5>
+          <p class="card-text">
+            Support temple welfare through online donations. Every act of giving is a blessing.
+          </p>
+          <a href="/donation" class="btn btn-danger">Donate Now</a>
+        </div>
+      </div>
     </div>
   </div>
-
-  <div class="container mt-5 text-center">
-    <h2>Experience Peace, Devotion, and Blessings</h2>
-    <p>Explore daily sevas, photo galleries, donate online, and get updates about temple events.</p>
-  </div>
+</div>
 {% endblock %}
