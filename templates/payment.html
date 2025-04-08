@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2>🪔 Seva Payment</h2>
+  <p><strong>Seva:</strong> {{ booking.seva_name }}</p>
+  <p><strong>Name:</strong> {{ booking.name }}</p>
+  <p><strong>Date:</strong> {{ booking.date }}</p>
+  <p><strong>Amount to Pay:</strong> ₹{{ booking.seva_price }}</p>
+
+  <form method="POST">
+    <!-- Simulated payment -->
+    <button class="btn btn-success mt-3">Pay ₹{{ booking.seva_price }}</button>
+    <a href="/seva" class="btn btn-secondary mt-3">Cancel</a>
+  </form>
+</div>
+{% endblock %}

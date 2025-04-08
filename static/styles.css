@@ -1,0 +1,65 @@
+/* SEVA PAGE STYLES */
+
+.seva-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #fdfdfd;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+}
+
+.seva-heading {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #5d0479;
+    font-weight: bold;
+}
+
+.seva-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.seva-card {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.seva-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+.seva-title {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.seva-price {
+    font-size: 1.1rem;
+    color: #8b008b;
+    margin-bottom: 15px;
+}
+
+.seva-book-btn {
+    display: inline-block;
+    background-color: #8b008b;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+
+.seva-book-btn:hover {
+    background-color: #6a006a;
+}

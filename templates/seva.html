@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">🙏 Available Sevas</h2>
+
+  <div class="row">
+    {% for seva in sevas %}
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ seva[1] }}</h5>
+          <p class="card-text">{{ seva[2] }}</p>
+          <p class="card-text fw-bold">₹{{ seva[3] }}</p>
+          <a href="/seva/book/{{ seva[0] }}" class="btn btn-primary w-100">Book Now</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

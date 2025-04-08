@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">🛕 Manage Sevas</h2>
+
+  <form method="POST" class="mb-4 border p-3 rounded shadow">
+    <h4>Add New Seva</h4>
+    <div class="mb-2">
+      <input class="form-control" name="name" placeholder="Seva Name" required>
+    </div>
+    <div class="mb-2">
+      <textarea class="form-control" name="description" placeholder="Description" rows="3" required></textarea>
+    </div>
+    <div class="mb-2">
+      <input class="form-control" name="price" placeholder="Price ₹" type="number" step="0.01" required>
+    </div>
+    <button class="btn btn-success">Add Seva</button>
+  </form>
+<a href="/admin" class="btn btn-secondary mb-3">← Back to Dashboard</a>
+
+  <h4 class="mb-3">Existing Sevas</h4>
+  <table class="table table-bordered shadow-sm">
+  <thead class="table-light">
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Price (₹)</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for seva in sevas %}
+    <tr>
+      <td>{{ seva[1] }}</td>
+      <td>{{ seva[2] }}</td>
+      <td>{{ seva[3] }}</td>
+      <td>
+        <a href="/admin/sevas/edit/{{ seva[0] }}" class="btn btn-sm btn-warning">Edit</a>
+        <a href="/admin/sevas/delete/{{ seva[0] }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this Seva?');">Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</div>
+{% endblock %}
+<table class="table table-bordered shadow-sm">
+  <thead class="table-light">
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Price (₹)</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for seva in sevas %}
+    <tr>
+      <td>{{ seva[1] }}</td>
+      <td>{{ seva[2] }}</td>
+      <td>{{ seva[3] }}</td>
+      <td>
+        <a href="/admin/sevas/edit/{{ seva[0] }}" class="btn btn-sm btn-warning">Edit</a>
+        <a href="/admin/sevas/delete/{{ seva[0] }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this Seva?');">Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">🛕 Admin Dashboard</h2>
+
+  <div class="text-end mb-4">
+    <a href="/logout" class="btn btn-danger">Logout</a>
+  </div>
+  <a href="/admin/sevas" class="btn btn-primary mt-3">Manage Sevas</a>
+
+  <h4 class="mb-3">Recent Donations</h4>
+  <table class="table table-striped shadow-sm">
+    <thead class="table-dark">
+      <tr>
+        <th>Name</th>
+        <th>Amount (₹)</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in donations %}
+      <tr>
+        <td>{{ d[0] }}</td>
+        <td>{{ d[1] }}</td>
+        <td>{{ d[2] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h4 class="mt-5 mb-3">Contact Messages</h4>
+  <table class="table table-bordered shadow-sm">
+    <thead class="table-secondary">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Message</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in contacts %}
+      <tr>
+        <td>{{ c[0] }}</td>
+        <td>{{ c[1] }}</td>
+        <td>{{ c[2] }}</td>
+        <td>{{ c[3] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- New Section for Seva Bookings -->
+  <h4 class="mt-5 mb-3">📜 Seva Bookings</h4>
+  <table class="table table-bordered shadow-sm">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Seva</th>
+        <th>Booked By</th>
+        <th>Contact</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for booking in bookings %}
+      <tr>
+        <td>{{ booking[0] }}</td>
+        <td>{{ booking[1] }}</td>
+        <td>{{ booking[2] }}</td>
+        <td>{{ booking[3] }}</td>
+        <td>{{ booking[4] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+{% endblock %}
