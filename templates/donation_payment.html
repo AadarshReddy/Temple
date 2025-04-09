@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Complete Your Donation</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <p class="text-center">
+        Please scan the QR code below to donate ₹{{ donation.amount }} via UPI.
+      </p>
+      <div class="text-center">
+         <img src="{{ url_for('static', filename='images/upi_qr.png') }}" alt="UPI QR" width="200" class="img-thumbnail">
+      </div>
+      <form method="POST" class="mt-4 text-center">
+          <button type="submit" class="btn btn-success">I have paid</button>
+          <a href="/donation" class="btn btn-secondary">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

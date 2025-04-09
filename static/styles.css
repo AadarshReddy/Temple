@@ -63,3 +63,28 @@
 .seva-book-btn:hover {
     background-color: #6a006a;
 }
+
+.navbar-custom {
+  /* If you just want color, do: background-color: #6b4a3a; */
+  background: url('/static/images/nav-bg.jpg') no-repeat center center;
+  background-size: cover;
+}
+
+.navbar-brand {
+  color: #fff !important;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-link {
+  color: #fff !important;
+}
+
+.navbar-toggler {
+  border: none;
+}
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg...");
+  /* or any custom icon in base64 if needed */
+}
+

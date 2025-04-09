@@ -85,10 +85,31 @@ def donation():
     if request.method == 'POST':
         name = request.form['name']
         amount = request.form['amount']
-        cursor.execute("INSERT INTO Donations (Name, Amount) VALUES (?, ?)", (name, amount))
-        conn.commit()
-        return render_template('thankyou.html', name=name, amount=amount)
+        # Store the donation details temporarily in the session
+        session['donation'] = {
+            'name': name,
+            'amount': amount
+        }
+        return redirect('/donation/payment')
     return render_template('donation.html')
+
+
+@app.route('/donation/payment', methods=['GET', 'POST'])
+def donation_payment():
+    donation = session.get('donation')
+    if not donation:
+        return redirect('/donation')  # Ensure we have donation details
+
+    if request.method == 'POST':
+        # Simulate payment confirmation by inserting the donation into the database
+        cursor.execute("INSERT INTO Donations (Name, Amount) VALUES (?, ?)",
+                       (donation['name'], donation['amount']))
+        conn.commit()
+        session.pop('donation')  # Clear the temporary donation info
+        return render_template('thankyou.html', name=donation['name'], amount=donation['amount'])
+
+    return render_template('donation_payment.html', donation=donation)
+
 
 @app.route('/invoice')
 def invoice():
