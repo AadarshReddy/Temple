@@ -1,16 +1,54 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-5">
-  <h2>🪔 Seva Payment</h2>
-  <p><strong>Seva:</strong> {{ booking.seva_name }}</p>
-  <p><strong>Name:</strong> {{ booking.name }}</p>
-  <p><strong>Date:</strong> {{ booking.date }}</p>
-  <p><strong>Amount to Pay:</strong> ₹{{ booking.seva_price }}</p>
+  <h2 class="text-center mb-4">Complete Your Seva Payment</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+      <p>Please click the button below to pay ₹{{ booking.seva_price }}</p>
 
-  <form method="POST">
-    <!-- Simulated payment -->
-    <button class="btn btn-success mt-3">Pay ₹{{ booking.seva_price }}</button>
-    <a href="/seva" class="btn btn-secondary mt-3">Cancel</a>
-  </form>
+      <!-- Hidden form to capture Razorpay response -->
+      <form id="sevaPaymentForm" method="POST" action="/seva/payment">
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+      </form>
+
+      <!-- Custom "Pay Now" Button -->
+      <button id="rzp-button-seva" class="btn btn-primary">Pay Now</button>
+    </div>
+  </div>
 </div>
+
+<!-- Load Razorpay Checkout Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  var options = {
+      "key": "{{ test_key_id }}", // Razorpay test key passed from Flask
+      "amount": "{{ razorpay_order.amount }}", // Amount in paise
+      "currency": "INR",
+      "name": "Lord Venkateswara Temple",
+      "description": "Seva Payment",
+      "order_id": "{{ razorpay_order.id }}",
+      "handler": function (response){
+          // Set the Razorpay response details into the hidden form
+          document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+          document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+          document.getElementById('razorpay_signature').value = response.razorpay_signature;
+          // Submit the form to the seva_payment route
+          document.getElementById('sevaPaymentForm').submit();
+      },
+      "prefill": {
+          "name": "{{ booking.name }}"
+      },
+      "theme": {
+          "color": "#8b008b"
+      }
+  };
+
+  var rzp1 = new Razorpay(options);
+  document.getElementById('rzp-button-seva').onclick = function(e){
+      rzp1.open();
+      e.preventDefault();
+  }
+</script>
 {% endblock %}

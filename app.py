@@ -5,8 +5,14 @@ from flask import make_response
 from reportlab.pdfgen import canvas
 import io
 from datetime import datetime
-print("Working directory:", os.getcwd())
-print("Templates found:", os.listdir('templates'))
+
+import razorpay
+
+# Replace these with your actual test key and secret from Razorpay dashboard
+TEST_KEY_ID = "rzp_test_sfRH5AEuORSOPa"
+TEST_KEY_SECRET = "rb84MsGswjKPslxQbWUdB6EM"
+
+razorpay_client = razorpay.Client(auth=(TEST_KEY_ID, TEST_KEY_SECRET))
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'  # Required for session management
@@ -38,44 +44,73 @@ def seva():
     sevas = cursor.fetchall()
     return render_template('seva.html', sevas=sevas)
 
+
 @app.route('/seva/book/<int:seva_id>', methods=['GET', 'POST'])
 def book_seva(seva_id):
     cursor.execute("SELECT * FROM Sevas WHERE Id=?", (seva_id,))
     seva = cursor.fetchone()
+    if not seva:
+        return "Seva not found", 404
 
     if request.method == 'POST':
         name = request.form['name']
         contact = request.form['contact']
         date = request.form['date']
-
-        session['booking'] = {
+        # Save seva booking details in session
+        session['seva_booking'] = {
             'seva_id': seva_id,
             'name': name,
             'contact': contact,
             'date': date,
             'seva_name': seva[1],
-            'seva_price': seva[3]
+            'seva_price': seva[3]  # assuming index 3 holds the price
         }
         return redirect('/seva/payment')
 
     return render_template('book_seva.html', seva=seva)
 
 
-
 @app.route('/seva/payment', methods=['GET', 'POST'])
 def seva_payment():
-    booking = session.get('booking')
+    booking = session.get('seva_booking')
     if not booking:
-        return redirect('/seva')
+        return redirect('/seva')  # Redirect if no booking found
 
     if request.method == 'POST':
-        cursor.execute("INSERT INTO SevaBookings (SevaId, Name, Contact, Date) VALUES (?, ?, ?, ?)",
-                       (booking['seva_id'], booking['name'], booking['contact'], booking['date']))
-        conn.commit()
-        session.pop('booking')
-        return render_template('thankyou.html', message="Payment Successful! Seva booked.")
+        # Extract payment details from Razorpay Checkout
+        payment_id = request.form.get('razorpay_payment_id')
+        order_id = request.form.get('razorpay_order_id')
+        signature = request.form.get('razorpay_signature')
+        params_dict = {
+            'razorpay_order_id': order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+        try:
+            razorpay_client.utility.verify_payment_signature(params_dict)
+            # Payment verified, insert seva booking into the database
+            # Adjust the INSERT as per your SevaBookings table schema
+            cursor.execute("INSERT INTO SevaBookings (SevaId, Name, Contact, Date) VALUES (?, ?, ?, ?)",
+                           (booking['seva_id'], booking['name'], booking['contact'], booking['date']))
+            conn.commit()
+            session.pop('seva_booking')
+            return render_template('thankyou.html', name=booking['name'], amount=booking['seva_price'])
+        except razorpay.errors.SignatureVerificationError:
+            return "Payment verification failed", 400
 
-    return render_template('payment.html', booking=booking)
+    # For GET: Create a Razorpay order
+    amount_in_paise = int(float(booking['seva_price']) * 100)
+    order_data = {
+        "amount": amount_in_paise,
+        "currency": "INR",
+        "payment_capture": "1"
+    }
+    razorpay_order = razorpay_client.order.create(order_data)
+    booking['razorpay_order_id'] = razorpay_order['id']
+    session['seva_booking'] = booking
+
+    return render_template('payment.html', booking=booking, razorpay_order=razorpay_order, test_key_id=TEST_KEY_ID)
+
 
 
 
@@ -85,30 +120,54 @@ def donation():
     if request.method == 'POST':
         name = request.form['name']
         amount = request.form['amount']
-        # Store the donation details temporarily in the session
-        session['donation'] = {
-            'name': name,
-            'amount': amount
-        }
+        # Save donation details in the session
+        session['donation'] = {'name': name, 'amount': amount}
         return redirect('/donation/payment')
     return render_template('donation.html')
+
 
 
 @app.route('/donation/payment', methods=['GET', 'POST'])
 def donation_payment():
     donation = session.get('donation')
     if not donation:
-        return redirect('/donation')  # Ensure we have donation details
+        return redirect('/donation')
 
     if request.method == 'POST':
-        # Simulate payment confirmation by inserting the donation into the database
-        cursor.execute("INSERT INTO Donations (Name, Amount) VALUES (?, ?)",
-                       (donation['name'], donation['amount']))
-        conn.commit()
-        session.pop('donation')  # Clear the temporary donation info
-        return render_template('thankyou.html', name=donation['name'], amount=donation['amount'])
+        # Process the payment verification after Razorpay Checkout completes
+        payment_id = request.form.get('razorpay_payment_id')
+        order_id = request.form.get('razorpay_order_id')
+        signature = request.form.get('razorpay_signature')
+        params_dict = {
+            'razorpay_order_id': order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+        try:
+            razorpay_client.utility.verify_payment_signature(params_dict)
+            # Payment is verified; record donation in the DB
+            cursor.execute("INSERT INTO Donations (Name, Amount) VALUES (?, ?)",
+                           (donation['name'], donation['amount']))
+            conn.commit()
+            session.pop('donation')
+            return render_template('thankyou.html',  name=donation['name'], amount=donation['amount'])
+        except razorpay.errors.SignatureVerificationError:
+            return "Payment verification failed", 400
 
-    return render_template('donation_payment.html', donation=donation)
+    # For GET request: Create a Razorpay order
+    # Convert donation amount to paise (multiply by 100)
+    amount_in_paise = int(float(donation['amount']) * 100)
+    order_data = {
+        "amount": amount_in_paise,
+        "currency": "INR",
+        "payment_capture": "1"  # Auto-capture payment after success
+    }
+    razorpay_order = razorpay_client.order.create(order_data)
+    donation['razorpay_order_id'] = razorpay_order['id']
+    session['donation'] = donation  # Update session with order ID
+    return render_template('donation_payment.html', donation=donation, razorpay_order=razorpay_order,test_key_id=TEST_KEY_ID)
+    #return render_template('donation_payment.html', donation=donation, razorpay_order=razorpay_order)
+
 
 
 @app.route('/invoice')
@@ -122,11 +181,11 @@ def invoice():
 
     # PDF content
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(200, 800, "Donation Invoice")
+    p.drawString(200, 800, "Payment Invoice")
 
     p.setFont("Helvetica", 12)
     p.drawString(50, 750, f"Name: {name}")
-    p.drawString(50, 730, f"Amount Donated: ₹{amount}")
+    p.drawString(50, 730, f"Amount Donated: ₹ {amount}")
     p.drawString(50, 710, f"Date: {date}")
     p.drawString(50, 690, "Temple: Lord Venkateswara Temple")
     p.drawString(50, 670, "Thank you for your support and devotion!")
