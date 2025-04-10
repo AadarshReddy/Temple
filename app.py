@@ -1,10 +1,18 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, url_for
+
 import pyodbc
 import os
 from flask import make_response
 from reportlab.pdfgen import canvas
 import io
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import inch
+from reportlab.lib.colors import black, lightgrey
+from reportlab.pdfgen import canvas
+import io
+from flask import request, make_response
 from datetime import datetime
+import random
 
 import razorpay
 
@@ -77,7 +85,6 @@ def seva_payment():
         return redirect('/seva')  # Redirect if no booking found
 
     if request.method == 'POST':
-        # Extract payment details from Razorpay Checkout
         payment_id = request.form.get('razorpay_payment_id')
         order_id = request.form.get('razorpay_order_id')
         signature = request.form.get('razorpay_signature')
@@ -88,15 +95,24 @@ def seva_payment():
         }
         try:
             razorpay_client.utility.verify_payment_signature(params_dict)
-            # Payment verified, insert seva booking into the database
-            # Adjust the INSERT as per your SevaBookings table schema
-            cursor.execute("INSERT INTO SevaBookings (SevaId, Name, Contact, Date) VALUES (?, ?, ?, ?)",
-                           (booking['seva_id'], booking['name'], booking['contact'], booking['date']))
+
+            # Insert seva booking into the database
+            cursor.execute(
+                "INSERT INTO SevaBookings (SevaId, Name, Contact, Date) VALUES (?, ?, ?, ?)",
+                (booking['seva_id'], booking['name'], booking['contact'], booking['date'])
+            )
             conn.commit()
+
+            amount = booking['seva_price']
+            name = booking['name']
+            # Ensure this value is stored in session
             session.pop('seva_booking')
-            return render_template('thankyou.html', name=booking['name'], amount=booking['seva_price'])
+
+            return redirect(url_for('thank_you', name=name, amount=amount, type='seva'))
+
         except razorpay.errors.SignatureVerificationError:
             return "Payment verification failed", 400
+
 
     # For GET: Create a Razorpay order
     amount_in_paise = int(float(booking['seva_price']) * 100)
@@ -134,61 +150,90 @@ def donation_payment():
         return redirect('/donation')
 
     if request.method == 'POST':
-        # Process the payment verification after Razorpay Checkout completes
         payment_id = request.form.get('razorpay_payment_id')
         order_id = request.form.get('razorpay_order_id')
         signature = request.form.get('razorpay_signature')
+
         params_dict = {
             'razorpay_order_id': order_id,
             'razorpay_payment_id': payment_id,
             'razorpay_signature': signature
         }
+
         try:
             razorpay_client.utility.verify_payment_signature(params_dict)
-            # Payment is verified; record donation in the DB
+
             cursor.execute("INSERT INTO Donations (Name, Amount) VALUES (?, ?)",
                            (donation['name'], donation['amount']))
             conn.commit()
             session.pop('donation')
-            return render_template('thankyou.html',  name=donation['name'], amount=donation['amount'])
+
+            return redirect(url_for('thank_you', name=donation['name'], amount=donation['amount'], type='donation'))
+
+
         except razorpay.errors.SignatureVerificationError:
             return "Payment verification failed", 400
 
-    # For GET request: Create a Razorpay order
-    # Convert donation amount to paise (multiply by 100)
     amount_in_paise = int(float(donation['amount']) * 100)
     order_data = {
         "amount": amount_in_paise,
         "currency": "INR",
-        "payment_capture": "1"  # Auto-capture payment after success
+        "payment_capture": "1"
     }
     razorpay_order = razorpay_client.order.create(order_data)
     donation['razorpay_order_id'] = razorpay_order['id']
-    session['donation'] = donation  # Update session with order ID
-    return render_template('donation_payment.html', donation=donation, razorpay_order=razorpay_order,test_key_id=TEST_KEY_ID)
-    #return render_template('donation_payment.html', donation=donation, razorpay_order=razorpay_order)
+    session['donation'] = donation
+
+    return render_template('donation_payment.html', donation=donation, razorpay_order=razorpay_order, test_key_id=TEST_KEY_ID)
+
 
 
 
 @app.route('/invoice')
 def invoice():
-    name = request.args.get('name')
-    amount = request.args.get('amount')
+    name = request.args.get('name', 'Donor')
+    amount = request.args.get('amount', '0.00')
     date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    invoice_number = f"INV{datetime.now().strftime('%Y%m%d')}{random.randint(1000,9999)}"
 
     buffer = io.BytesIO()
-    p = canvas.Canvas(buffer)
+    p = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
 
-    # PDF content
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(200, 800, "Payment Invoice")
+    # Header
+    p.setFont("Helvetica-Bold", 18)
+    p.drawCentredString(width / 2, height - 80, "LORD VENKATESWARA TEMPLE")
+    p.setFont("Helvetica", 10)
+    p.drawCentredString(width / 2, height - 100, "Temple Address, City, Pincode")
+    p.drawCentredString(width / 2, height - 115, "PAN: ABCDE1234F | 80G Reg No: AAAAA1234A/05/80G")
+    p.drawCentredString(width / 2, height - 130, "Email: temple@email.com | Phone: 9876543210")
 
+    # Invoice Title
+    p.setFont("Helvetica-Bold", 14)
+    p.drawCentredString(width / 2, height - 170, "Donation Receipt")
+
+    # Rectangle Box
+    p.setStrokeColor(lightgrey)
+    p.setLineWidth(1)
+    p.rect(50, height - 430, width - 100, 230, stroke=1, fill=0)
+
+    # Receipt Info
     p.setFont("Helvetica", 12)
-    p.drawString(50, 750, f"Name: {name}")
-    p.drawString(50, 730, f"Amount Donated: ₹ {amount}")
-    p.drawString(50, 710, f"Date: {date}")
-    p.drawString(50, 690, "Temple: Lord Venkateswara Temple")
-    p.drawString(50, 670, "Thank you for your support and devotion!")
+    line_y = height - 200
+    line_gap = 25
+    p.drawString(70, line_y, f"Receipt No: {invoice_number}")
+    p.drawString(70, line_y - line_gap, f"Date of Donation: {date}")
+    p.drawString(70, line_y - 2 * line_gap, f"Donor Name: {name}")
+    p.drawString(70, line_y - 3 * line_gap, f"Amount Donated: ₹ {amount}")
+    p.drawString(70, line_y - 4 * line_gap, "Payment Mode: Online (Razorpay)")
+
+    # Declaration
+    p.setFont("Helvetica-Oblique", 10)
+    p.drawString(70, line_y - 6 * line_gap, "Note: This donation is eligible for tax exemption under Section 80G of the Income Tax Act, 1961.")
+
+    # Footer
+    p.setFont("Helvetica-Bold", 12)
+    p.drawCentredString(width / 2, 100, "🙏 Thank you for your generous support 🙏")
 
     p.showPage()
     p.save()
@@ -198,7 +243,6 @@ def invoice():
         'Content-Type': 'application/pdf',
         'Content-Disposition': f'attachment; filename={name}_donation_invoice.pdf'
     })
-
 
 
 @app.route('/contact', methods=['GET', 'POST'])
@@ -299,6 +343,22 @@ def login():
         else:
             return "Invalid username or password!"
     return render_template('login.html')
+
+@app.route('/thank_you')
+def thank_you():
+    name = request.args.get('name')
+    amount = request.args.get('amount')
+    type_ = request.args.get('type')  # renamed to avoid Python keyword
+    return render_template('thankyou.html', name=name, amount=amount, type=type_)
+
+    if type == 'seva':
+        message = f"🙏 Thank You for Booking the Seva, {name}!"
+        sub_message = f"You have successfully booked the Seva for ₹{amount}."
+    else:
+        message = f"🙏 Thank You for Your Donation, {name}!"
+        sub_message = f"We sincerely appreciate your generous donation of ₹{amount}."
+
+    return render_template('thankyou.html', message=message, sub_message=sub_message)
 
 
 @app.route('/logout')

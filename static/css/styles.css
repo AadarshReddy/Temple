@@ -14,7 +14,7 @@ body {
 
 /* === Navigation Bar === */
 .navbar {
-  background-color: #8d6e63;  /* warm, earthy tone */
+  background: linear-gradient(45deg, #f9b233, #e67e22);  /* gandham tone */
   padding: 10px 20px;
   position: relative;
   z-index: 1000;
@@ -53,6 +53,29 @@ body {
 .navbar-nav li a:hover {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
+}
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 80%; /* 5:4 aspect ratio */
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+.image-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.image-wrapper:hover img {
+  transform: scale(1.05);
 }
 
 /* === Hero Section === */
@@ -111,6 +134,7 @@ body {
   padding: 20px 0;
 }
 
+
 /* === Buttons === */
 .btn {
   padding: 10px 20px;
@@ -147,6 +171,19 @@ body {
 .btn-success:hover {
   background: #218838;
 }
+
+.object-fit-cover {
+  object-fit: cover;
+}
+about-temple img {
+  object-fit: cover;
+}
+
+about-temple p {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
 /* Reset and basic styles */
 * {
   margin: 0;

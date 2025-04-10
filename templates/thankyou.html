@@ -2,16 +2,23 @@
 
 {% block content %}
 <div class="container mt-5 text-center">
-  <h2 class="text-success">🙏 Thank You for Your Donation!</h2>
-  <p class="mt-3 fs-5">Dear <strong>{{ name }}</strong>,</p>
-  <p class="fs-5">We sincerely appreciate your generous donation of <strong>₹{{ amount }}</strong>.</p>
-  <p class="text-muted">May Lord Venkateswara bless you with health, peace, and prosperity.</p>
-  <a href="{{ url_for('invoice', name=name, amount=amount) }}" class="btn btn-secondary mt-3">Download Invoice (PDF)</a>
+  {% if type == 'donation' %}
+    <h2 class="text-success">🙏 Thank You for Your Donation!</h2>
+    <p class="fs-5 mt-3">Dear <strong>{{ name }}</strong>, we sincerely appreciate your generous donation of <strong>₹{{ amount }}</strong>.</p>
+  {% elif type == 'seva' %}
+    <h2 class="text-success">🙏 Thank You for Booking Seva!</h2>
+    <p class="fs-5 mt-3">Dear <strong>{{ name }}</strong>, your seva has been booked successfully for <strong>₹{{ amount }}</strong>.</p>
+  {% else %}
+    <h2 class="text-success">🙏 Thank You!</h2>
+    <p class="fs-5">Your request has been received.</p>
+  {% endif %}
 
+  <p class="text-muted">May Lord Venkateswara bless you with health, peace, and prosperity.</p>
+
+  {% if type == 'donation' %}
+    <a href="{{ url_for('invoice', name=name, amount=amount) }}" class="btn btn-secondary mt-3">Download Invoice (PDF)</a>
+  {% endif %}
 
   <a href="/" class="btn btn-primary mt-4">Back to Home</a>
 </div>
 {% endblock %}
-
-
-

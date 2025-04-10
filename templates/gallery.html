@@ -1,13 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="text-center mb-4">Temple Gallery</h2>
+<div class="container my-5">
+  <h2 class="text-center mb-4">📸 Temple Photo Gallery</h2>
+
   <div class="row g-4">
-    {% for i in range(1, 7) %}
-    <div class="col-sm-6 col-md-4">
-      <a href="{{ url_for('static', filename='images/photo' ~ i ~ '.jpg') }}" data-lightbox="temple-gallery" data-title="Temple Image {{ i }}">
-        <img src="{{ url_for('static', filename='images/photo' ~ i ~ '.jpg') }}" class="img-fluid rounded shadow" alt="Temple Image {{ i }}">
+    {% for i in range(1, 13) %}  {# You can change range according to your image count #}
+    <div class="col-6 col-md-4 col-lg-3">
+      <a href="{{ url_for('static', filename='images/photo' ~ i ~ '.jpg') }}"
+         data-lightbox="temple-gallery"
+         data-title="Temple Image {{ i }}">
+        <div class="image-wrapper shadow-sm rounded">
+          <img src="{{ url_for('static', filename='images/photo' ~ i ~ '.jpg') }}"
+               alt="Temple Image {{ i }}"
+               class="img-fluid rounded">
+        </div>
       </a>
     </div>
     {% endfor %}
