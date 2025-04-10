@@ -16,7 +16,7 @@
     <!-- Card 1: Seva & Darshanam -->
     <div class="col">
       <div class="card h-100 shadow-sm service-card">
-        <img src="/static/images/seva-icon.png" class="card-img-top p-4" alt="Seva Icon">
+        <img src="/static/images/seva-icon.svg" class="card-img-top p-4" alt="Seva Icon">
         <div class="card-body text-center">
           <h5 class="card-title fw-bold">Seva & Darshanam</h5>
           <p class="card-text">
@@ -30,7 +30,7 @@
     <!-- Card 2: Annadanam -->
     <div class="col">
       <div class="card h-100 shadow-sm service-card">
-        <img src="/static/images/annadanam.png" class="card-img-top p-4" alt="Annadanam Icon">
+        <img src="/static/images/annadanam.svg" class="card-img-top p-4" alt="Annadanam Icon">
         <div class="card-body text-center">
           <h5 class="card-title fw-bold">Annadanam</h5>
           <p class="card-text">
@@ -44,7 +44,7 @@
     <!-- Card 3: Accommodation -->
     <div class="col">
       <div class="card h-100 shadow-sm service-card">
-        <img src="/static/images/accommodation.png" class="card-img-top p-4" alt="Accommodation Icon">
+        <img src="/static/images/accommodation.svg" class="card-img-top p-4" alt="Accommodation Icon">
         <div class="card-body text-center">
           <h5 class="card-title fw-bold">Accommodation</h5>
           <p class="card-text">
@@ -58,7 +58,7 @@
     <!-- Card 4: Donation -->
     <div class="col">
       <div class="card h-100 shadow-sm service-card">
-        <img src="/static/images/donation.png" class="card-img-top p-4" alt="Donation Icon">
+        <img src="/static/images/donation.svg" class="card-img-top p-4" alt="Donation Icon">
         <div class="card-body text-center">
           <h5 class="card-title fw-bold">Donation</h5>
           <p class="card-text">
@@ -70,4 +70,85 @@
     </div>
   </div>
 </div>
+<!-- Photo Gallery Section -->
+<section class="container my-5">
+  <h2 class="text-center text-danger fw-bold mb-4">Photo Gallery</h2>
+  <div class="text-center mb-3">
+    <img src="{{ url_for('static', filename='images/divider.svg') }}" alt="Divider" style="width: 100px;">
+  </div>
+
+  <div class="row g-3">
+    {% for i in range(1, 7) %}
+    <div class="col-sm-6 col-md-4">
+      <div class="rounded overflow-hidden shadow-sm h-100">
+        <img src="{{ url_for('static', filename='images/photo' ~ i ~ '.jpg') }}"
+             class="img-fluid w-100 h-100 object-fit-cover"
+             style="aspect-ratio: 5/4;"
+             alt="Gallery Image {{ i }}">
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="/gallery" class="btn btn-danger px-4 py-2 rounded-pill">
+      View Now <i class="bi bi-arrow-right-circle-fill ms-1"></i>
+    </a>
+  </div>
+
+</section>
+<!-- About Temple Section -->
+<section class="py-5 bg-light" id="about-temple">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <!-- Left Images -->
+      <div class="col-md-6 position-relative">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Temple Icon"
+             class="img-fluid rounded shadow-sm position-absolute top-0 start-0"
+             style="width: 150px; z-index: 2; background: white; border-radius: 1rem; padding: 10px;">
+
+        <img src="{{ url_for('static', filename='images/temple-pushkarini.jpg') }}"
+             alt="Temple Pool"
+             class="img-fluid rounded shadow w-100" style="margin-top: 80px;">
+      </div>
+
+      <!-- Right Text -->
+      <div class="col-md-6">
+        <h2 class="fw-bold text-danger mb-2">About Temple</h2>
+        <img src="{{ url_for('static', filename='images/divider.svg') }}" alt="Divider" style="width: 120px;" class="mb-3">
+
+        <p class="text-muted">
+          Sri Venkateswara Swamy Temple, popularly known as the Tirumala Balaji Temple, is one of the most
+          revered and visited pilgrimage sites in the world. Located in the Tirumala Hills of Andhra Pradesh,
+          it is dedicated to Lord Venkateswara, an incarnation of Lord Vishnu, believed to have appeared in
+          this sacred place to save mankind from the trials and troubles of the Kali Yuga.
+        </p>
+        <p class="text-muted">
+          The temple is widely known for its spiritual significance, majestic architecture, and the world-famous
+          deity richly adorned with jewels and garments. Devotees believe that Lord Venkateswara is the
+          “Kaliyuga Daivam” (Lord of the Kali Yuga).
+        </p>
+        <p class="text-muted">
+          Millions of devotees from across the globe visit this holy shrine each year to have darshan of the
+          Lord and offer their hair, prayers, and donations in gratitude and faith.
+        </p>
+
+        <!-- Info Buttons -->
+        <div class="d-flex flex-wrap gap-3 mt-3">
+          <a href="#temple" class="btn btn-outline-warning rounded-pill">
+            🛕 The Temple
+          </a>
+          <a href="#history" class="btn btn-outline-warning rounded-pill">
+            📜 The History
+          </a>
+          <a href="#info" class="btn btn-outline-warning rounded-pill">
+            📌 General Information
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 {% endblock %}
